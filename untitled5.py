@@ -71,6 +71,8 @@ plt.show()
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(data, label, test_size=0.3)
 
+# print(y_train,y_test)
+
 # 5
 from sklearn.neighbors import KNeighborsClassifier
 neigh = KNeighborsClassifier(n_neighbors=3)
@@ -89,7 +91,7 @@ neigh1.fit(data,label)
 print(neigh1.score(X_test, y_test))
 print(neigh.score(X_test, y_test))
 
-# 9
+# 9 #1 from here lab_04 begins
 from sklearn.metrics import confusion_matrix, classification_report
 y_train_pred=neigh.predict(X_train)
 y_test_pred=neigh.predict(X_test)
@@ -131,3 +133,200 @@ elif train_accuracy < 0.70 and test_accuracy < 0.70:
     print("The model is Underfitting.")
 else:
     print("The model is Generalized well (Regular fit).")
+
+#2
+from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score
+import numpy as np
+x = np.array([386, 289, 393, 110, 280, 167, 271, 274, 148, 198])
+x_result = np.array([386, 289, 393, 110, 280, 167, 271, 274, 148, 198])
+MSE=mean_squared_error(x,x_result)
+RMSE=np.sqrt(MSE)
+MAPE=mean_absolute_percentage_error(x,x_result)
+R2=r2_score(x,x_result)
+print("mean square error:",MSE)
+print("root mean square error:",RMSE)
+print("mean absolute persentage error:",MAPE)
+print("R2 score :",R2)
+
+#3
+import numpy as np
+import matplotlib.pyplot as plt
+np.random.seed(43)
+data=np.random.uniform(1, 10, (20, 2))
+classes=np.random.choice([0, 1], size=20)
+class_0=data[classes==0]
+class_1=data[classes==1]
+
+plt.figure(figsize=(8,6))
+plt.scatter(class_0[:, 0], class_0[:, 1], color='blue', label='Class 0 - Blue')
+plt.scatter(class_1[:, 0], class_1[:, 1], color='red', label='Class 1 - Red')
+plt.title('Scatter Plot of Training Data')
+plt.xlabel('Feature X')
+plt.ylabel('Feature Y')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+#4
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
+import itertools
+
+np.random.seed(43)
+x_train=np.random.uniform(1,10,(20,2))
+y_train=np.random.choice([0,1],size=20)
+
+x_test=np.arange(0,10.1,0.1)
+y_test=np.arange(0,10.1,0.1)
+x1,y1=np.meshgrid(x_test,y_test)
+test_data=np.c_[x1.ravel(),y1.ravel()]
+
+knn=KNeighborsClassifier(n_neighbors=3)
+knn.fit(x_train,y_train)
+
+predicted_labels=knn.predict(test_data)
+predicted_labels=predicted_labels.reshape(x1.shape)
+
+plt.figure(figsize=(8, 6))
+plt.contourf(x1, y1,predicted_labels,alpha=0.8,cmap='coolwarm')
+plt.scatter(x_train[:,0],x_train[:, 1],c=y_train,edgecolor='k',s=100,cmap='coolwarm')
+plt.title('kNN')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.colorbar(label='Predicted Class')
+plt.grid(True)
+
+# 5
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
+
+np.random.seed(43)
+
+x_train=np.random.uniform(1, 10, (20, 2))
+y_train=np.random.choice([0, 1], size=20)
+
+x_test=np.arange(0, 10.1, 0.1)
+y_test=np.arange(0, 10.1, 0.1)
+x1,y1=np.meshgrid(x_test, y_test)
+test_data=np.c_[x1.ravel(), y1.ravel()]
+
+k_values=[1, 3, 5, 7, 9]
+
+fig,axes=plt.subplots(nrows=2,ncols=3,figsize=(18,12))
+axes=axes.flatten()
+
+for i,k in enumerate(k_values):
+    knn=KNeighborsClassifier(n_neighbors=k)
+    knn.fit(x_train,y_train)
+
+    predicted_labels=knn.predict(test_data)
+    predicted_labels=predicted_labels.reshape(x1.shape)
+
+    ax=axes[i]
+    ax.contourf(x1,y1,predicted_labels,alpha=0.8,cmap='coolwarm')
+    ax.scatter(x_train[:, 0],x_train[:, 1],c=y_train,edgecolor='k',s=100,cmap='coolwarm')
+    ax.set_title(f'k={k}')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.grid(True)
+
+plt.tight_layout()
+plt.show()
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
+df = pd.read_excel("output.xlsx")
+
+#6
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KNeighborsClassifier
+import pandas as pd
+
+np.random.seed(43)
+selected_columns=df.iloc[:,:-1]
+selected_label=df.iloc[:,-1]
+data=selected_columns
+label=selected_label
+data_female=data[label==0].sample(n=10,random_state=43)
+data_male=data[label==1].sample(n=10,random_state=42)
+train_set=pd.concat([data_female,data_male])
+feat_x=9
+feat_y=10
+X_train=train_set[[feat_x,feat_y]].values
+y_train=label[train_set.index].values
+plt.figure(figsize=(6,6))
+clr={0:'blue',1:'red'}
+for lbl in np.unique(y_train):
+    subset=train_set[label[train_set.index]==lbl]
+    plt.scatter(subset[feat_x],subset[feat_y],color=clr[lbl],label=f'Class {lbl} ({"Female" if lbl==0 else "Male"})')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Training Data: 20 Samples')
+plt.legend()
+plt.show()
+x_min,x_max=0,0.06
+y_min,y_max=0,0.02
+x1,y1=np.meshgrid(np.arange(x_min,x_max,0.001),np.arange(y_min,y_max,0.001))
+X_test=np.c_[x1.ravel(),y1.ravel()]
+knn=KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train,y_train)
+y_test_pred=knn.predict(X_test)
+Z=y_test_pred.reshape(x1.shape)
+plt.figure(figsize=(6,6))
+plt.contourf(x1,y1,Z,alpha=0.3,cmap=plt.cm.RdBu)
+plt.scatter(X_train[:,0],X_train[:,1],c=y_train,cmap=plt.cm.RdBu,edgecolor='k',s=80)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('kNN Classification (k=3) on Test Grid')
+plt.show()
+k_vals=[1,3,5,7,9]
+fig,axes=plt.subplots(1,len(k_vals),figsize=(20,4),sharex=True,sharey=True)
+for ax,k in zip(axes,k_vals):
+    knn=KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train,y_train)
+    y_test_pred=knn.predict(X_test)
+    Z=y_test_pred.reshape(x1.shape)
+    ax.contourf(x1,y1,Z,alpha=0.3,cmap=plt.cm.RdBu)
+    ax.scatter(X_train[:,0],X_train[:,1],c=y_train,cmap=plt.cm.RdBu,edgecolor='k',s=80)
+    ax.set_title(f'k={k}')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+plt.suptitle('kNN Classification for Various k Values')
+plt.show()
+
+# 7
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import GridSearchCV,train_test_split
+
+np.random.seed(42)
+train_data=np.random.uniform(1,10,(20,2))
+train_labels=np.random.choice([0,1],size=20)
+X_train,X_val,y_train,y_val=train_test_split(train_data,train_labels,test_size=0.2,random_state=42)
+knn=KNeighborsClassifier()
+param_grid={'n_neighbors':list(range(1,21,2))}
+grid_search=GridSearchCV(estimator=knn,param_grid=param_grid,cv=5,scoring='accuracy')
+grid_search.fit(X_train,y_train)
+best_k=grid_search.best_params_['n_neighbors']
+best_score=grid_search.best_score_
+print(f"Best k value: {best_k}")
+print(f"Best validation accuracy: {best_score:.4f}")
+best_knn=grid_search.best_estimator_
+val_accuracy=best_knn.score(X_val,y_val)
+print(f"Validation accuracy with best k: {val_accuracy:.4f}")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
